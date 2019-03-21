@@ -53,6 +53,18 @@ $ make
 $ sudo make install
 ```
 
+#### On Arch Linux:
+
+It has dependency on the `pod2man` which is part of the perl5 package.
+
+```
+$ git clone https://github.com/dex4er/nss-docker
+$ ./autogen.sh
+# env POD2MAN=/usr/bin/core_perl/pod2man ./configure --prefix=/usr
+$ make
+$ sudo make install
+```
+
 ## Testing
 
 The tests requires root priviliges (for real chroot because `/etc/nsswitch.conf` can't be changed to another file)
