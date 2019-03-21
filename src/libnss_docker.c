@@ -162,18 +162,27 @@ enum nss_status _nss_docker_gethostbyname3_r(
     strncpy(hostname, name, sizeof(hostname));
     hostname[name_len] = '\0';
 
-    /* Handle only .docker domain */
-    if ((hostname_suffix_ptr = strstr(hostname, DOCKER_DOMAIN_SUFFIX)) == NULL) {
-        *errnop = EADDRNOTAVAIL;
-        goto return_unavail;
-    }
+    /* Handle suffix only if it is present */
+    if (DOCKER_DOMAIN_SUFFIX[0] != '\0') {
+        /* Handle only .docker domain */
+        if ((hostname_suffix_ptr = strstr(hostname, DOCKER_DOMAIN_SUFFIX)) == NULL) {
+            *errnop = EADDRNOTAVAIL;
+            goto return_unavail;
+        }
 
-    if (hostname_suffix_ptr[sizeof(DOCKER_DOMAIN_SUFFIX) - 1] != '\0') {
-        *errnop = EADDRNOTAVAIL;
-        goto return_unavail;
-    }
+        if (hostname_suffix_ptr[sizeof(DOCKER_DOMAIN_SUFFIX) - 1] != '\0') {
+            *errnop = EADDRNOTAVAIL;
+            goto return_unavail;
+        }
 
-    *hostname_suffix_ptr = '\0';
+        *hostname_suffix_ptr = '\0';
+    } else {
+        /* Handle only it does not contain dots */
+        if (strstr(hostname, ".") != NULL) {
+            *errnop = EADDRNOTAVAIL;
+            goto return_unavail;
+        }
+    }
 
     /* Connect to Docker API socket */
     memset((char *) &docker_api_addr, 0, sizeof(docker_api_addr));
